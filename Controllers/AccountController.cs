@@ -10,17 +10,8 @@ using NetCoreCookieAuth.Models;
 
 namespace NetCoreCookieAuth.Controllers
 {
-    [Route("api/[controller]")]
     public class AccountController : Controller
     {
-
-        [HttpGet]
-        [Authorize]
-        public IActionResult Info()
-        {
-            return Ok("ok");
-        }
-
         [HttpPost]
         public async Task<IActionResult> Login(User user)
         {
@@ -53,6 +44,11 @@ namespace NetCoreCookieAuth.Controllers
             return Unauthorized();
         }
 
-        
+        [HttpGet]
+        [Authorize]
+        public IActionResult Info()
+        {
+            return Ok("ok");
+        }
     }
 }
