@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ namespace NetCoreCookieAuth.Controllers
     public class AccountController : Controller
     {
         [HttpPost]
-        public async Task<IActionResult> Login(User user)
+        public async Task<IActionResult> Login([FromBody]UserViewModel model)
         {
             var userList = new List<User>()
             {
@@ -22,12 +23,12 @@ namespace NetCoreCookieAuth.Controllers
                 new User(){Id = Guid.NewGuid().ToString(),Name = "zhouyu",Password = "123456"}
             };
 
-            if (string.IsNullOrWhiteSpace(user.Name) || string.IsNullOrWhiteSpace(user.Password))
+            if (string.IsNullOrWhiteSpace(model.Name) || string.IsNullOrWhiteSpace(model.Password))
             {
                 return BadRequest("用户名和密码不能为空");
             }
 
-            var existUser = userList.FirstOrDefault(x => x.Name == user.Name && x.Password == user.Password);
+            var existUser = userList.FirstOrDefault(x => x.Name == model.Name && x.Password == model.Password);
 
             if (existUser != null)
             {
@@ -37,7 +38,7 @@ namespace NetCoreCookieAuth.Controllers
 
                 var claimsPrincipal = new ClaimsPrincipal(claims);
 
-                await HttpContext.Authentication.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 
                 return Ok("登录成功");
             }
@@ -45,7 +46,7 @@ namespace NetCoreCookieAuth.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize()]
         public IActionResult Info()
         {
             return Ok("ok");
